@@ -1,17 +1,14 @@
-# from tkinter import *
 import customtkinter as ctk
 import random
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
-# window = Tk()
-window = ctk.CTk()
+window = ctk.CTk(fg_color="white")
 window.title("Random Choice")
 window.geometry("300x300")
 window.resizable(False, False)
 window.iconbitmap("random.ico")
-window.configure(bg="white")
 
 filename = "list_of_choices.txt"
 list_of_choices = []
@@ -25,15 +22,14 @@ def createList():
 createList()
 
 def Dice():
-    # output_box['text'] = random.randint(1,13)
-    output_box.configure(text=random.choice(list_of_choices), bg_color="green", text_color="white", font=("Arial", 16))
+    output_box.configure(text=random.choice(list_of_choices), bg_color="#E0F2F1", text_color="#0E8573", font=("sans-serif", 16), corner_radius=20)
 
 
 def add():
     add_elem.place_forget()
-    text_box.place(x=80, y=80)
+    text_box.place(x=70, y=90)
     text_box.focus_set()
-    enter.place(x=170, y=80)
+    enter.place(x=170, y=90)
     window.bind("<Escape>", lambda event: (text_box.place_forget(), enter.place_forget(), add_elem.place(x=80, y=80)))
 
 
@@ -54,7 +50,7 @@ def submit():
         already_exist.place(x=80, y=120)
         text_box.place_forget()
         enter.place_forget()
-        add_elem.place(x=80, y=80)
+        add_elem.place(x=80, y=90)
         window.after(2000, already_exist.place_forget)
         return
     
@@ -64,33 +60,37 @@ def submit():
 
         text_box.place_forget()
         enter.place_forget()
-        add_elem.place(x=80, y=80)
+        add_elem.place(x=80, y=90)
         createList()
 
 
-# output_box = Message()
 output_box = ctk.CTkLabel(
     window,
     text="",
-    bg_color="white",
-    text_color="black",
+    bg_color="#E0E0E0",
     wraplength=280,
     width=280,
     height=100,
-    corner_radius=30,
+    corner_radius=100,
 )
-# output_box["relief"] = "sunken"
 output_box.place(x=10, y=150)
-# output_box["bg"] = "yellow"
-# output_box["aspect"] = 1000
 
 btn = ctk.CTkButton(window, text="Choose a thing to do", command=Dice, width=150, height=30)
 btn.place(x=80, y=50)
 
-add_elem = ctk.CTkButton(window, text="Add a thing", command=add, width=150, height=30)
-add_elem.place(x=80, y=100)
+add_elem = ctk.CTkButton(window, text="Add a thing", command=add, width=150, height=30, fg_color="#0E8573", text_color="white", hover_color="#0B6B5A")
+add_elem.place(x=80, y=90)
 
-text_box = ctk.CTkEntry(window, width=75, height=30)
-enter = ctk.CTkButton(window, text="Save", command=submit, width=75, height=30)
+text_box = ctk.CTkEntry(window, width=80, height=30)
+enter = ctk.CTkButton(
+    window,
+    text="Save",
+    command=submit,
+    width=75,
+    height=30,
+    fg_color="#B39DDB", 
+    hover_color="#9575CD",  
+    text_color="white"
+)
 
 window.mainloop()
