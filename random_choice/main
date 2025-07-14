@@ -9,9 +9,9 @@ window = ctk.CTk(fg_color="white")
 window.title("Random Choice")
 window.geometry("300x300")
 window.resizable(False, False)
-window.iconbitmap("random.ico")
+window.iconbitmap("./assets/random.ico")
 
-filename = "list_of_choices.txt"
+filename = "./list_of_choices.txt"
 list_of_choices = []
 
 
