@@ -21,5 +21,5 @@ setup(
     description="A simple GUI application for making random choices.",
     license="MIT",
     keywords="random choice gui",
-    url="https://github.com/Feriel080/RandomChoice.git",
+    url="https://github.com/Feriel080/RandomChoice",
 )
