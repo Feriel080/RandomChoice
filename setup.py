@@ -16,10 +16,10 @@ setup(
     package_data={
         '': ['assets/*.ico'],
     },
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Feriel080",
+    author_email="aourferiel22@outlook.com",
     description="A simple GUI application for making random choices.",
     license="MIT",
     keywords="random choice gui",
-    url="https://github.com/yourusername/random-choice-app",
+    url="https://github.com/Feriel080/RandomChoice.git",
 )
