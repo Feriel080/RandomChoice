@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import random
+import os
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
@@ -16,6 +17,9 @@ list_of_choices = []
 
 def createList():
     global list_of_choices
+    if not os.path.exists(filename):
+        with open(filename, "w") as file:
+            pass
     with open(filename, "r") as file:
         list_of_choices = file.read().splitlines()
 
