@@ -1,0 +1,96 @@
+# from tkinter import *
+import customtkinter as ctk
+import random
+
+ctk.set_appearance_mode("light")
+ctk.set_default_color_theme("blue")
+
+# window = Tk()
+window = ctk.CTk()
+window.title("Random Choice")
+window.geometry("300x300")
+window.resizable(False, False)
+window.iconbitmap("random.ico")
+window.configure(bg="white")
+
+filename = "list_of_choices.txt"
+list_of_choices = []
+
+
+def createList():
+    global list_of_choices
+    with open(filename, "r") as file:
+        list_of_choices = file.read().splitlines()
+
+createList()
+
+def Dice():
+    # output_box['text'] = random.randint(1,13)
+    output_box.configure(text=random.choice(list_of_choices), bg_color="green", text_color="white", font=("Arial", 16))
+
+
+def add():
+    add_elem.place_forget()
+    text_box.place(x=80, y=80)
+    text_box.focus_set()
+    enter.place(x=170, y=80)
+    window.bind("<Escape>", lambda event: (text_box.place_forget(), enter.place_forget(), add_elem.place(x=80, y=80)))
+
+
+def submit():
+    thing = text_box.get()
+    text_box.delete(0, ctk.END)
+    
+    if thing in list_of_choices:
+        already_exist = ctk.CTkLabel(
+            window,
+            text=f"{thing} already exists!",
+            bg_color="transparent",
+            text_color="red",
+            width=75,
+            height=30,
+            corner_radius=30,
+        )
+        already_exist.place(x=80, y=120)
+        text_box.place_forget()
+        enter.place_forget()
+        add_elem.place(x=80, y=80)
+        window.after(2000, already_exist.place_forget)
+        return
+    
+    else:
+        with open(filename, "a") as file:
+            file.write(thing + "\n")
+
+        text_box.place_forget()
+        enter.place_forget()
+        add_elem.place(x=80, y=80)
+        createList()
+
+
+# output_box = Message()
+output_box = ctk.CTkLabel(
+    window,
+    text="",
+    bg_color="white",
+    text_color="black",
+    wraplength=280,
+    width=280,
+    height=100,
+    corner_radius=30,
+)
+# output_box["relief"] = "sunken"
+output_box.place(x=10, y=150)
+# output_box["bg"] = "yellow"
+# output_box["aspect"] = 1000
+
+btn = ctk.CTkButton(window, text="Choose a thing to do", command=Dice, width=150, height=30)
+btn.place(x=80, y=50)
+
+add_elem = ctk.CTkButton(window, text="Add a thing", command=add, width=150, height=30)
+add_elem.place(x=80, y=100)
+
+text_box = ctk.CTkEntry(window, width=75, height=30)
+enter = ctk.CTkButton(window, text="Save", command=submit, width=75, height=30)
+
+window.mainloop()
