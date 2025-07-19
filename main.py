@@ -4,6 +4,16 @@ import os
 import time
 import platform
 import subprocess
+import sys
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
@@ -12,7 +22,7 @@ window = ctk.CTk(fg_color="white")
 window.title("Random Choice")
 window.geometry("300x300")
 window.resizable(False, False)
-window.iconbitmap("./assets/random.ico")
+window.iconbitmap(resource_path("assets/random.ico"))
 
 filename = "list_of_choices.txt"
 filepath = f"{filename}"
