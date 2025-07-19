@@ -1,6 +1,9 @@
 import customtkinter as ctk
 import random
 import os
+import time
+import platform
+import subprocess
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
@@ -12,6 +15,7 @@ window.resizable(False, False)
 window.iconbitmap("./assets/random.ico")
 
 filename = "./list_of_choices.txt"
+filepath = f"{filename}"
 list_of_choices = []
 
 
@@ -61,27 +65,32 @@ def add():
 def submit():
     thing = text_box.get()
     text_box.delete(0, ctk.END)
+    exist_or_saved = ctk.CTkLabel(
+        window,
+        bg_color="transparent",
+        width=75,
+        height=30,
+        corner_radius=30,
+    )
 
     if thing in list_of_choices:
-        already_exist = ctk.CTkLabel(
-            window,
-            text=f"{thing} already exists!",
-            bg_color="transparent",
-            text_color="red",
-            width=75,
-            height=30,
-            corner_radius=30,
-        )
-        already_exist.place(x=80, y=120)
+        exist_or_saved.configure(text=f"{thing} already exists!", text_color="red")
+        exist_or_saved.place(x=80, y=120)
         text_box.place_forget()
         enter.place_forget()
         add_elem.place(x=80, y=90)
-        window.after(2000, already_exist.place_forget)
+        window.after(2000, exist_or_saved.place_forget)
         return
 
     else:
         with open(filename, "a") as file:
             file.write(thing + "\n")
+
+        exist_or_saved.configure(
+            text=f"'{thing}' added successfully", text_color="#0E8573"
+        )
+        exist_or_saved.place(x=70, y=120)
+        window.after(2000, exist_or_saved.place_forget)
 
         text_box.place_forget()
         enter.place_forget()
@@ -129,5 +138,38 @@ enter = ctk.CTkButton(
     hover_color="#9575CD",
     text_color="white",
 )
+
+def open_file():
+    if os.path.exists(filepath):
+        if platform.system() == 'Windows':
+            os.startfile(filepath)
+            time.sleep(10)
+        
+        elif platform.system() == 'Darwin':
+            process = subprocess.Popen(['open', filepath])
+            process.wait()
+            
+        else:
+            process = subprocess.Popen(['xdg-open', filepath])
+            process.wait()
+            
+    else:
+        createList()
+    
+    createList()
+
+
+open_list = ctk.CTkButton(
+    window,
+    text="view list",
+    command=open_file,
+    width=75,
+    height=30,
+    fg_color="transparent",
+    text_color="black",
+    font=("sans-serif", 13, "underline"),
+    hover_color="#CFCFCF",
+)
+open_list.place(x=5, y=5)
 
 window.mainloop()
