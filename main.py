@@ -14,7 +14,7 @@ window.geometry("300x300")
 window.resizable(False, False)
 window.iconbitmap("./assets/random.ico")
 
-filename = "./list_of_choices.txt"
+filename = "list_of_choices.txt"
 filepath = f"{filename}"
 list_of_choices = []
 

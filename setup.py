@@ -10,7 +10,7 @@ setup(
     ],
     entry_points={
         'gui_scripts': [
-            'random-choice-app=random_choice.main:main',
+            'random-choice-app=main:main',
         ],
     },
     package_data={
