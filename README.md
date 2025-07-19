@@ -4,4 +4,4 @@ A simple python app using customTkinter that selects a random element from a lis
 
 
 ***To download the app:***
-[Download Installer](https://github.com/Feriel080/RandomChoice/releases/latest/download/RandomChoice.exe)
+[![Download Latest Release](https://img.shields.io/badge/Download-Latest_Release-green?style=for-the-badge&logo=github)](https://github.com/Feriel080/RandomChoice/releases/latest)
