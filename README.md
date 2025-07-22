@@ -1,7 +1,10 @@
 # RandomChoice
+
 ![Build Status](https://github.com/Feriel080/RandomChoice/workflows/Build%20Installer/badge.svg)
 
-A simple python app using customTkinter that selects a random element from a list and shows it.
+A simple cross-platform app using flutter as front-end and python (fast API) for backend.
+
+This app allows the user to enter multiple elements and it chose one randomly then prints it.
 
 ***To download the app:***
 
