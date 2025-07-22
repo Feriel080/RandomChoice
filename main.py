@@ -6,6 +6,7 @@ import platform
 import subprocess
 import sys
 
+
 def resource_path(relative_path):
     try:
         base_path = sys._MEIPASS
@@ -67,7 +68,7 @@ def add():
         lambda event: (
             text_box.place_forget(),
             enter.place_forget(),
-            add_elem.place(x=80, y=80),
+            add_elem.place(x=80, y=90),
         ),
     )
 
@@ -149,6 +150,10 @@ enter = ctk.CTkButton(
     text_color="white",
 )
 
+
+
+
+
 def open_file():
     if os.path.exists(filepath):
         if platform.system() == 'Windows':
@@ -162,11 +167,10 @@ def open_file():
         else:
             process = subprocess.Popen(['xdg-open', filepath])
             process.wait()
-            
+    
+    
     else:
         createList()
-    
-    createList()
 
 
 open_list = ctk.CTkButton(
