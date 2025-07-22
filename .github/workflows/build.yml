@@ -9,7 +9,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13.2'
+          python-version: "3.13.2"
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Build .exe
@@ -19,8 +19,8 @@ jobs:
       - name: Build installer
         run: iscc randomChoice.iss
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: Output/RandomChoice.exe
-          asset_name: RandomChoice.exe
+          files: Output/RandomChoice.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
