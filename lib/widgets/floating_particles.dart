@@ -88,7 +88,7 @@ class ParticlePainter extends CustomPainter {
         particle.x = Random().nextDouble();
       }
 
-      paint.color = Colors.white.withOpacity(particle.opacity);
+      paint.color = Colors.white.withValues(alpha: particle.opacity);
       canvas.drawCircle(
         Offset(
           particle.x * size.width,

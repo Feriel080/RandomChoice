@@ -16,19 +16,15 @@ add_executable(${BINARY_NAME} WIN32
   "runner.exe.manifest"
 )
 
-# Apply the standard set of build settings. This can be removed for applications
-# that need different build settings.
-apply_standard_settings(${BINARY_NAME})
-
 # Add preprocessor definitions for the build version.
-target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION=\"${FLUTTER_VERSION}\"")
-target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_MAJOR=${FLUTTER_VERSION_MAJOR}")
-target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_MINOR=${FLUTTER_VERSION_MINOR}")
-target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_PATCH=${FLUTTER_VERSION_PATCH}")
-target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_BUILD=${FLUTTER_VERSION_BUILD}")
-
-# Disable Windows macros that collide with C++ standard library functions.
-target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
+target_compile_definitions(${BINARY_NAME} PRIVATE
+  "FLUTTER_VERSION=\"${FLUTTER_VERSION}\""
+  "FLUTTER_VERSION_MAJOR=${FLUTTER_VERSION_MAJOR}"
+  "FLUTTER_VERSION_MINOR=${FLUTTER_VERSION_MINOR}"
+  "FLUTTER_VERSION_PATCH=${FLUTTER_VERSION_PATCH}"
+  "FLUTTER_VERSION_BUILD=${FLUTTER_VERSION_BUILD}"
+  "NOMINMAX"
+)
 
 # Add dependency libraries and include directories. Add any application-specific
 # dependencies here.
