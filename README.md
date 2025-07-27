@@ -1,7 +1,5 @@
 # RandomChoice
 
-![Build Status](https://github.com/Feriel080/RandomChoice/workflows/Build%20Installer/badge.svg)
-
 A simple cross-platform app using flutter as front-end and python (fast API) for backend. Useful for decision-making, raffle draws, or random picks!
 
 ***To download the app's latest release:***
