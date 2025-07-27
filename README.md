@@ -18,25 +18,33 @@ A simple offline cross-platform app using flutter as front-end and python (fast 
 ### **Prerequisites**
 
 * Flutter SDK ([Installation Guide](https://docs.flutter.dev/get-started/install))
-* Dart (comes with Flutter)
 * Git (for cloning the repository)
+* Python ([Get latest version](https://www.python.org/downloads/))
 
 ### **📥 Clone the Repository**
 
-```
+```bash
 git clone https://github.com/yourusername/random-list-picker.git
 cd random-list-picker
 ```
 
 ### **🛠 Install Dependencies**
 
-```
+```bash
 flutter pub get
 ```
 
 ### **▶ Run the App**
 
+**Run the python app (backend.py):**
+
+```bash
+py scripts/backend.py
 ```
+
+**Then run the flutter app:**
+
+```bash
 flutter run
 ```
 
