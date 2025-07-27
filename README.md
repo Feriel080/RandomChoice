@@ -58,4 +58,4 @@ flutter run
 
 ## **📜 License**
 
-This project is licensed under the  **MIT License** . See [LICENSE](https://license/) for details.
+This project is licensed under the  **MIT License** . See [LICENSE]([https://license/](https://github.com/Feriel080/RandomChoice/blob/main/LICENCE)) for details.
