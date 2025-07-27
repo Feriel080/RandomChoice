@@ -24,8 +24,8 @@ A simple offline cross-platform app using flutter as front-end and python (fast 
 ### **📥 Clone the Repository**
 
 ```bash
-git clone https://github.com/yourusername/random-list-picker.git
-cd random-list-picker
+git clone https://github.com/Feriel080/RandomChoice.git
+cd RandomChoice
 ```
 
 ### **🛠 Install Dependencies**
