@@ -30,6 +30,14 @@ cd RandomChoice
 
 ### **🛠 Install Dependencies**
 
+**For python**
+
+```bash
+pip install -r requirements.txt
+```
+
+**For flutter**
+
 ```bash
 flutter pub get
 ```
