@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' show log;
 
 class LocalStorageService {
   static const String _choicesKey = 'random_choices';
@@ -13,7 +14,8 @@ class LocalStorageService {
         return choicesList.cast<String>();
       }
     } catch (e) {
-      print('Error loading choices from local storage: $e');
+      log('Error loading choices from local storage: $e');
+
     }
     return [];
   }
@@ -24,7 +26,7 @@ class LocalStorageService {
       final choicesJson = json.encode(choices);
       await prefs.setString(_choicesKey, choicesJson);
     } catch (e) {
-      print('Error saving choices to local storage: $e');
+      log('Error saving choices to local storage: $e');
     }
   }
   
@@ -41,7 +43,7 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_choicesKey);
     } catch (e) {
-      print('Error clearing choices: $e');
+      log('Error clearing choices: $e');
     }
   }
 
@@ -51,7 +53,7 @@ class LocalStorageService {
       choices.remove(choice);
       await saveChoices(choices);
     } catch (e) {
-      print('Error deleting choice from local storage: $e');
+      log('Error deleting choice from local storage: $e');
     }
   }
 }

@@ -255,7 +255,9 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
               );
 
               if (confirmed == true) {
-                Navigator.pop(context, 'clear_all');
+                if (context.mounted) {
+                   Navigator.pop(context, 'clear_all');
+                }
               }
             },
             icon: const Icon(Icons.delete, color: Color(0xFFffe3ea)),
