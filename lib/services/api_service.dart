@@ -5,12 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'local_storage_service.dart';
 
 class ApiService {
-  // Dynamic base URL based on platform
   String get baseUrl {
     if (kIsWeb) {
-      return 'http://localhost:8000'; // Web development
+      return 'http://localhost:8000'; 
     } else {
-      return 'http://localhost:8000'; // Desktop/Mobile
+      return 'http://localhost:8000'; 
     }
   }
   
