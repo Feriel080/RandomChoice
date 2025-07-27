@@ -22,7 +22,6 @@ class _FloatingParticlesState extends State<FloatingParticles>
       vsync: this,
     )..repeat();
 
-    // Create particles
     for (int i = 0; i < 20; i++) {
       _particles.add(Particle(
         x: _random.nextDouble(),
@@ -81,7 +80,6 @@ class ParticlePainter extends CustomPainter {
     final paint = Paint();
 
     for (final particle in particles) {
-      // Update particle position
       particle.y -= particle.speed * 0.01;
       if (particle.y < 0) {
         particle.y = 1.0;

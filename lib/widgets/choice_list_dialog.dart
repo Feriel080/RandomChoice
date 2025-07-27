@@ -106,7 +106,6 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
           );
         }
       } finally {
-        // added this
         setState(() {
           _deletingItems.remove(choice);
         });

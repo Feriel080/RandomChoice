@@ -20,19 +20,17 @@ class RandomChoiceGameApp extends StatelessWidget {
         fontFamily: 'Caveat',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // Show splash screen only on mobile platforms
       home: _shouldShowSplash() ? const SplashScreen() : const GameScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 
   bool _shouldShowSplash() {
-    // Show splash screen on mobile platforms (Android/iOS)
-    if (kIsWeb) return false; // Not on web
+    if (kIsWeb) return false; 
     try {
       return Platform.isAndroid || Platform.isIOS;
     } catch (e) {
-      return false; // Fallback for unsupported platforms
+      return false; 
     }
   }
 }
