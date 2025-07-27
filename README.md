@@ -2,9 +2,7 @@
 
 A simple offline cross-platform app using flutter as front-end and python (fast API) for backend. Useful for decision-making, raffle draws, or random picks!
 
-***To download the app's first release (using CustomTkinter not flutter):***
-
-[![Download Latest Release](https://img.shields.io/badge/Download-Latest_Release-green?style=for-the-badge&logo=github)](https://github.com/Feriel080/RandomChoice/releases/download/v1.0/RandomChoice.exe)
+***The app is not ready for installation yet***
 
 ## Features ✨
 
