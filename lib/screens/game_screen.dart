@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/api_service.dart';
+import 'dart:math';
+import '../services/local_storage_service.dart';
 import '../widgets/floating_particles.dart';
 import '../widgets/choice_card.dart';
 import '../widgets/add_choice_dialog.dart';
@@ -14,7 +15,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
-  final ApiService _apiService = ApiService();
+  final LocalStorageService _localStorage = LocalStorageService();
   List<String> _choices = [];
   String? _selectedChoice;
   bool _isLoading = false;
@@ -66,7 +67,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   Future<void> _loadChoices() async {
     setState(() => _isLoading = true);
     try {
-      final choices = await _apiService.getChoices();
+      final choices = await _localStorage.getChoices();
       setState(() {
         _choices = choices;
         _isLoading = false;
@@ -91,7 +92,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     try {
       await Future.delayed(const Duration(milliseconds: 1500)); // Suspense
-      final choice = await _apiService.getRandomChoice();
+      
+      final choice = _choices[Random().nextInt(_choices.length)];
 
       _pulseController.stop();
       _pulseController.reset();
@@ -113,9 +115,19 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   Future<void> _addChoice(String choice) async {
     try {
-      await _apiService.addChoice(choice);
+      final trimmedChoice = choice.trim().toLowerCase();
+
+      if (trimmedChoice.isEmpty) {
+        throw Exception('Choice cannot be empty!');
+      }
+      
+      if (_choices.contains(trimmedChoice)) {
+        throw Exception('Choice already exists!');
+      }
+
+      await _localStorage.addChoice(trimmedChoice);
       await _loadChoices();
-      _showSuccessSnackBar('"$choice" added successfully! ✨');
+      _showSuccessSnackBar('"$trimmedChoice" added successfully! ✨');
     } catch (e) {
       _showErrorSnackBar(e.toString());
     }
@@ -143,7 +155,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     if (confirmed == true) {
       try {
-        await _apiService.clearChoices();
+        await _localStorage.clearChoices();
         await _loadChoices();
         setState(() => _selectedChoice = null);
         _showSuccessSnackBar('All choices cleared! 🧹');
@@ -155,7 +167,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   Future<void> _deleteChoice(String choice) async {
     try {
-      await _apiService.deleteChoice(choice);
+      await _localStorage.deleteChoice(choice);
       await _loadChoices();
       if (_selectedChoice == choice) {
         setState(() => _selectedChoice = null);
