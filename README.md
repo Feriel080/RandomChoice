@@ -11,49 +11,6 @@ A simple offline cross-platform app using flutter as front-end and python (fast 
 * Clean and intuitive UI
 * Cross-platform (works on Android, iOS, Windows, Linux, and macOS)
 
-## **🚀 Getting Started**
-
-### **Prerequisites**
-
-* Flutter SDK ([Installation Guide](https://docs.flutter.dev/get-started/install))
-* Git (for cloning the repository)
-* Python ([Get latest version](https://www.python.org/downloads/))
-
-### **📥 Clone the Repository**
-
-```bash
-git clone https://github.com/Feriel080/RandomChoice.git
-cd RandomChoice
-```
-
-### **🛠 Install Dependencies**
-
-**For python**
-
-```bash
-pip install -r requirements.txt
-```
-
-**For flutter**
-
-```bash
-flutter pub get
-```
-
-### **▶ Run the App**
-
-**Run the python app (backend.py):**
-
-```bash
-py scripts/backend.py
-```
-
-**Then run the flutter app:**
-
-```bash
-flutter run
-```
-
 ## **📜 License**
 
 This project is licensed under the  **MIT License** . See [LICENSE](https://github.com/Feriel080/RandomChoice?tab=MIT-1-ov-file) for details.
