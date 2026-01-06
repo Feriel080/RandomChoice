@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' show Platform;
 import 'screens/splash_screen.dart';
 import 'screens/game_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();  
+  await SharedPreferences.getInstance(); 
+
   runApp(const RandomChoiceGameApp());
 }
 
