@@ -1,6 +1,6 @@
-name: random_choice
-description: "Randomly choose an item from a list."
-version: 2.0.0
+name: random
+description: "A new Flutter project." 
+version: 1.0.0+1
 
 environment:
   sdk: ^3.8.1
@@ -14,7 +14,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
 
 flutter:
@@ -22,7 +22,6 @@ flutter:
 
 flutter_launcher_icons:
   android: true
-  ios: false
   image_path: "assets/random_choice_icon.png"
   adaptive_icon_background: "#667eea" 
   adaptive_icon_foreground: "assets/random_choice_icon.png"
