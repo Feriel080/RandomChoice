@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.random"
+    namespace = "com.example.randomchoice"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -19,8 +19,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.random"
+        applicationId = "com.example.randomchoice"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -29,7 +28,6 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
