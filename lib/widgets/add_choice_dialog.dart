@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AddChoiceDialog extends StatefulWidget {
-  final Function(String) onAdd;
+  final Function(String, String) onAdd;
 
   const AddChoiceDialog({super.key, required this.onAdd});
 
@@ -10,23 +10,31 @@ class AddChoiceDialog extends StatefulWidget {
 }
 
 class _AddChoiceDialogState extends State<AddChoiceDialog> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _choiceController = TextEditingController();
+  final TextEditingController _categoryController = TextEditingController();
   bool _isLoading = false;
+  bool _submitted = false;
 
   @override
   void dispose() {
-    _controller.dispose();
+    _choiceController.dispose();
+    _categoryController.dispose();
     super.dispose();
   }
 
   Future<void> _addChoice() async {
-    final choice = _controller.text.trim();
-    if (choice.isEmpty) return;
+    final choice = _choiceController.text.trim();
+    final category = _categoryController.text.trim();
+
+    if (choice.isEmpty || category.isEmpty) {
+      setState(() => _submitted = true);
+      return;
+    }
 
     setState(() => _isLoading = true);
-    
+
     try {
-      await widget.onAdd(choice);
+      await widget.onAdd(category, choice);
       if (mounted) {
         Navigator.pop(context);
       }
@@ -34,13 +42,24 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     }
+  }
+
+  InputDecoration _fieldDecoration({
+    required String hint,
+    required IconData icon,
+    required bool isEmpty
+  }) {
+    final showError = _submitted && isEmpty;
+    return InputDecoration(
+      hintText: hint,
+      border: const OutlineInputBorder(),
+      prefixIcon: Icon(icon),
+      errorText: showError ? 'This field is required' : null,
+    );
   }
 
   @override
@@ -51,18 +70,30 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            controller: _controller,
-            decoration: const InputDecoration(
-              hintText: 'Write here...',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.add_circle_outline),
+            controller: _categoryController,
+            decoration: _fieldDecoration(
+              hint: 'Category',
+              icon: Icons.category_outlined,
+              isEmpty: _categoryController.text.trim().isEmpty
             ),
             autofocus: true,
+            onChanged: (_) { if (_submitted) setState(() {}); },
+            onSubmitted: (_) => _addChoice(),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _choiceController,
+            decoration: _fieldDecoration(
+              hint: 'Choice',
+              icon: Icons.add_circle_outline,
+              isEmpty: _choiceController.text.trim().isEmpty
+            ),
+            onChanged: (_) { if (_submitted) setState(() {}); },
             onSubmitted: (_) => _addChoice(),
           ),
           const SizedBox(height: 10),
           const Text(
-            'Enter any kind of activity you want to do.',
+            'The category is for grouping your choices.',
             style: TextStyle(
               fontSize: 17,
               color: Color.fromARGB(255, 133, 131, 131),
@@ -77,13 +108,17 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
         ),
         ElevatedButton(
           onPressed: _isLoading ? null : _addChoice,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.purple,
+            foregroundColor: Colors.white,
+          ),
           child: _isLoading
-            ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : const Text('Add'),
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Add', style: TextStyle(color: Colors.white)),
         ),
       ],
     );
