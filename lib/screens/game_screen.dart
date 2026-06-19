@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 import 'dart:math';
 import '../services/local_storage_service.dart';
 import '../widgets/floating_particles.dart';
@@ -16,14 +17,17 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   final LocalStorageService _localStorage = LocalStorageService();
-  List<String> _choices = [];
+  Map<String, List<String>> _choices = {};
   String? _selectedChoice;
+  String? _selectedCategory;
   bool _isLoading = false;
 
   late AnimationController _pulseController;
   late AnimationController _shakeController;
   late Animation<double> _pulseAnimation;
   late Animation<double> _shakeAnimation;
+
+  final logger = Logger(); // .d: debug, h.i: info, w: warning, e: error
 
   @override
   void initState() {
@@ -40,21 +44,13 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    _pulseAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
 
-    _shakeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 10.0,
-    ).animate(CurvedAnimation(
-      parent: _shakeController,
-      curve: Curves.elasticIn,
-    ));
+    _shakeAnimation = Tween<double>(begin: 0.0, end: 10.0).animate(
+      CurvedAnimation(parent: _shakeController, curve: Curves.elasticIn),
+    );
   }
 
   @override
@@ -70,6 +66,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       final choices = await _localStorage.getChoices();
       setState(() {
         _choices = choices;
+        if (_selectedCategory != null && !_choices.containsKey(_selectedCategory)) {
+          _selectedCategory = null;
+        }
         _isLoading = false;
       });
     } catch (e) {
@@ -79,9 +78,16 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _getRandomChoice() async {
-    if (_choices.isEmpty) {
+    if(_selectedCategory == null) {
+      _showErrorSnackBar('Please select a category first!');
+      return;
+    }
+
+    final categoryChoices = _choices[_selectedCategory] ?? [];
+
+    if (categoryChoices.isEmpty) {
       _shakeController.forward().then((_) => _shakeController.reset());
-      _showErrorSnackBar('Add some choices first!');
+      _showErrorSnackBar('No choices available in the selected category!');
       return;
     }
 
@@ -92,8 +98,8 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
     try {
       await Future.delayed(const Duration(milliseconds: 1500)); // Suspense
-      
-      final choice = _choices[Random().nextInt(_choices.length)];
+
+      final choice = categoryChoices[Random().nextInt(categoryChoices.length)];
 
       _pulseController.stop();
       _pulseController.reset();
@@ -113,21 +119,20 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _addChoice(String choice) async {
+  Future<void> _addChoice(String category, String choice) async {
     try {
+      final trimmedCategory = category.trim().toLowerCase();
       final trimmedChoice = choice.trim().toLowerCase();
 
-      if (trimmedChoice.isEmpty) {
-        throw Exception('Choice cannot be empty!');
-      }
-      
-      if (_choices.contains(trimmedChoice)) {
-        throw Exception('Choice already exists!');
+      if (_choices[trimmedCategory]?.contains(trimmedChoice) == true) {
+        throw Exception('Choice already exists in this category!');
       }
 
-      await _localStorage.addChoice(trimmedChoice);
+      await _localStorage.addChoice(trimmedCategory, trimmedChoice);
       await _loadChoices();
-      _showSuccessSnackBar('"$trimmedChoice" added successfully! ✨');
+      _showSuccessSnackBar(
+        '"$trimmedChoice" of category "$trimmedCategory" added successfully! ✨',
+      );
     } catch (e) {
       _showErrorSnackBar(e.toString());
     }
@@ -165,9 +170,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _deleteChoice(String choice) async {
+  Future<void> _deleteChoice(String category, String choice) async {
     try {
-      await _localStorage.deleteChoice(choice);
+      await _localStorage.deleteChoice(category, choice);
       await _loadChoices();
       if (_selectedChoice == choice) {
         setState(() => _selectedChoice = null);
@@ -180,10 +185,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message,
-        style: const TextStyle(
-          fontSize: 16
-        ),),
+        content: Text(message, style: const TextStyle(fontSize: 16)),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
       ),
@@ -229,18 +231,85 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        alignment: Alignment.centerLeft,
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: DropdownButton(
+                          dropdownColor: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                          ),
+                          mouseCursor: SystemMouseCursors.click,
+                          dropdownMenuItemMouseCursor: SystemMouseCursors.click,
+                          underline: Container(),
+                          value: _selectedCategory,
+                          hint: const Text(
+                            'Select Category',
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                          selectedItemBuilder: (BuildContext context) {
+                            return _choices.keys.map((category) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  category,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              );
+                            }).toList();
+                          },
+                          items: [
+                            ..._choices.keys.map((category) {
+                              return DropdownMenuItem(
+                                value: category,
+                                child: Text(
+                                  category,
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 0, 0, 0),
+                                    fontSize: 18,
+                                  ),
+                                ),
+                              );
+                            }),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCategory = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 50),
 
                   // Choice counter
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '${_choices.length} choices available',
+                      _selectedCategory == null
+                          ? '${_choices.values.fold(0, (sum, list) => sum + list.length)} choices available'
+                          :'${_choices[_selectedCategory]?.length ?? 0} choices in "${_selectedCategory!}"',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
@@ -272,13 +341,14 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                                     gradient: const LinearGradient(
                                       colors: [
                                         Colors.orange,
-                                        Colors.deepOrange
+                                        Colors.deepOrange,
                                       ],
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.orange
-                                            .withValues(alpha: 0.5),
+                                        color: Colors.orange.withValues(
+                                          alpha: 0.5,
+                                        ),
                                         blurRadius: 20,
                                         spreadRadius: 5,
                                       ),
@@ -338,6 +408,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           context: context,
                           builder: (context) => AddChoiceDialog(
                             onAdd: _addChoice,
+                            existingCategories: _choices.keys.toList(),
                           ),
                         ),
                         icon: const Icon(Icons.add),
@@ -348,8 +419,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                             fontSize: 20,
                           ),
                         ),
-                        backgroundColor:
-                            const Color.fromARGB(255, 173, 240, 222),
+                        backgroundColor: const Color.fromARGB(
+                          255,
+                          173,
+                          240,
+                          222,
+                        ),
                       ),
                       FloatingActionButton.extended(
                         onPressed: () async {
