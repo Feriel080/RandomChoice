@@ -21,6 +21,9 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
   late AnimationController _controller;
   final Set<String> _deletingItems = {};
   late Map<String, List<String>> _currentChoices;
+  bool _isSearching = false;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -48,6 +51,7 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
   @override
   void dispose() {
     _controller.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -128,15 +132,72 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
 
   bool get _isEmpty => _currentChoices.values.every((list) => list.isEmpty);
 
+  Map<String, List<String>> get _filteredChoices {
+  if (_searchQuery.isEmpty) return _currentChoices;
+  return {
+    for (final entry in _currentChoices.entries)
+      entry.key: entry.value
+          .where(
+            (choice) =>
+                choice.toLowerCase().contains(_searchQuery.toLowerCase()),
+          )
+          .toList(),
+  }..removeWhere((_, list) => list.isEmpty);
+}
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
-          Icon(Icons.list, color: Color(0xFF591C75)),
-          SizedBox(width: 8),
-          Text('List Contents', style: TextStyle(fontWeight: FontWeight.bold)),
-          Spacer(),
+          const Icon(Icons.list, color: Color(0xFF591C75)),
+          const SizedBox(width: 8),
+          if (!_isSearching) ...[
+            const Text(
+              'List Contents',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(Icons.search, color: Color(0xFF591C75)),
+              onPressed: () {
+                setState(() {
+                  _isSearching = true;
+                });
+              },
+            ),
+          ] else ...[
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: Color(0xFF591C75),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, color: Color(0xFF591C75)),
+              onPressed: () {
+                setState(() {
+                  _isSearching = false;
+                  _searchQuery = '';
+                  _searchController.clear();
+                });
+              },
+            ),
+          ],
         ],
       ),
       content: SizedBox(
@@ -164,10 +225,7 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
                     SizedBox(height: 8),
                     Text(
                       'Add some choices to get started!',
-                      style: TextStyle(
-                        color: Color(0xFF444655),
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Color(0xFF444655), fontSize: 16),
                     ),
                   ],
                 ),
@@ -175,15 +233,15 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
             : AnimatedBuilder(
                 animation: _controller,
                 builder: (context, child) {
-                  final categories = _currentChoices.keys
-                      .where((cat) => _currentChoices[cat]!.isNotEmpty)
+                  final categories = _filteredChoices.keys
+                      .where((cat) => _filteredChoices[cat]!.isNotEmpty)
                       .toList();
 
                   return ListView.builder(
                     itemCount: categories.length,
                     itemBuilder: (context, index) {
                       final category = categories[index];
-                      final items = _currentChoices[category]!;
+                      final items = _filteredChoices[category]!;
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,7 +307,8 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
                                             Icons.delete,
                                             color: Color(0xFFce315f),
                                           ),
-                                          onPressed: () =>  _deleteChoice(category, choice),
+                                          onPressed: () =>
+                                              _deleteChoice(category, choice),
                                           tooltip: 'Delete this choice',
                                         ),
                                 ),
@@ -266,10 +325,7 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text(
-            'Close',
-            style: TextStyle(fontSize: 16)
-            ),
+          child: const Text('Close', style: TextStyle(fontSize: 16)),
         ),
         if (!_isEmpty)
           ElevatedButton.icon(
@@ -310,10 +366,7 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
             icon: const Icon(Icons.delete, color: Color(0xFFffe3ea)),
             label: const Text(
               'Clear All',
-              style: TextStyle(
-                color: Color(0xFFffe3ea),
-                fontSize: 16,
-                ),
+              style: TextStyle(color: Color(0xFFffe3ea), fontSize: 16),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFce315f),

@@ -28,3 +28,4 @@ flutter_launcher_icons:
   windows: 
     generate: true
     icon_path: "assets/random_choice_icon.png"
+  android: true
