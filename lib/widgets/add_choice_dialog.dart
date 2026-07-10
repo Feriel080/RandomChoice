@@ -15,7 +15,9 @@ class AddChoiceDialog extends StatefulWidget {
 }
 
 class _AddChoiceDialogState extends State<AddChoiceDialog> {
-  final TextEditingController _choiceController = TextEditingController();
+  final List<TextEditingController> _choiceControllers = [
+    TextEditingController(),
+  ];
   final TextEditingController _categoryController = TextEditingController();
   bool _isLoading = false;
   bool _submitted = false;
@@ -30,7 +32,9 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
 
   @override
   void dispose() {
-    _choiceController.dispose();
+    for (final controller in _choiceControllers) {
+      controller.dispose();
+    }
     _categoryController.dispose();
     super.dispose();
   }
@@ -41,11 +45,27 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
         : _selectedExistingCategory ?? '';
   }
 
-  Future<void> _addChoice() async {
-    final choice = _choiceController.text.trim();
-    final category = _resolvedCategory;
+  void _addChoiceField() {
+    setState(() {
+      _choiceControllers.add(TextEditingController());
+    });
+  }
 
-    if (choice.isEmpty || category.isEmpty) {
+  void _removeChoiceField(int index) {
+    setState(() {
+      _choiceControllers[index].dispose();
+      _choiceControllers.removeAt(index);
+    });
+  }
+
+  Future<void> _addChoice() async {
+    final category = _resolvedCategory;
+    final choices = _choiceControllers
+        .map((c) => c.text.trim())
+        .where((c) => c.isNotEmpty)
+        .toList();
+
+    if (choices.isEmpty || category.isEmpty) {
       setState(() => _submitted = true);
       return;
     }
@@ -53,7 +73,9 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
     setState(() => _isLoading = true);
 
     try {
-      await widget.onAdd(category, choice);
+      for (final choice in choices) {
+        await widget.onAdd(category, choice);
+      }
       if (mounted) {
         Navigator.pop(context);
       }
@@ -84,6 +106,9 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
   @override
   Widget build(BuildContext context) {
     final categoryIsEmpty = _categoryController.text.trim().isEmpty;
+    final allChoicesEmpty = _choiceControllers.every(
+      (c) => c.text.trim().isEmpty,
+    );
 
     return AlertDialog(
       title: const Text('Add New Item ✨'),
@@ -94,56 +119,53 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (widget.existingCategories.isNotEmpty)
-              ToggleButtons(
-                isSelected: [
-                  !_creatingNewCategory,
-                  _creatingNewCategory,
-                ],
-                onPressed: (index) {
-                  setState(() {
-                    _creatingNewCategory = index == 1;
-                  });
-                },
-                borderRadius: BorderRadius.circular(8),
-                constraints: const BoxConstraints(minHeight: 36, minWidth: 100),
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('Existing Category'),
+                ToggleButtons(
+                  isSelected: [!_creatingNewCategory, _creatingNewCategory],
+                  onPressed: (index) {
+                    setState(() {
+                      _creatingNewCategory = index == 1;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  constraints: const BoxConstraints(
+                    minHeight: 36,
+                    minWidth: 100,
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text('New Category'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-          
-              if (!_creatingNewCategory && widget.existingCategories.isNotEmpty)
-              DropdownButtonFormField<String>(
-                initialValue: _selectedExistingCategory,
-                decoration: _fieldDecoration(
-                  hint: 'Select Category',
-                  icon: Icons.category_outlined,
-                  isEmpty: _selectedExistingCategory == null,
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('Existing Category'),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text('New Category'),
+                    ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(8),
-                mouseCursor: SystemMouseCursors.click,
-                dropdownMenuItemMouseCursor: SystemMouseCursors.click,
-                items: widget.existingCategories.map((cat) {
-                  return DropdownMenuItem(
-                    value: cat,
-                    child: Text(cat),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedExistingCategory = val;
-                    if (_submitted) setState(() {});
-                  });
-                }
-              )
-              else 
+              const SizedBox(height: 10),
+
+              if (!_creatingNewCategory && widget.existingCategories.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedExistingCategory,
+                  decoration: _fieldDecoration(
+                    hint: 'Select Category',
+                    icon: Icons.category_outlined,
+                    isEmpty: _selectedExistingCategory == null,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                  mouseCursor: SystemMouseCursors.click,
+                  dropdownMenuItemMouseCursor: SystemMouseCursors.click,
+                  items: widget.existingCategories.map((cat) {
+                    return DropdownMenuItem(value: cat, child: Text(cat));
+                  }).toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedExistingCategory = val;
+                      if (_submitted) setState(() {});
+                    });
+                  },
+                )
+              else
                 TextField(
                   controller: _categoryController,
                   decoration: _fieldDecoration(
@@ -158,26 +180,54 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
                   onSubmitted: (_) => _addChoice(),
                 ),
               const SizedBox(height: 10),
-              TextField(
-                controller: _choiceController,
-                decoration: _fieldDecoration(
-                  hint: 'Choice',
-                  icon: Icons.add_circle_outline,
-                  isEmpty: _choiceController.text.trim().isEmpty,
+              ..._choiceControllers.asMap().entries.map((entry) {
+                final index = entry.key;
+                final controller = entry.value;
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: controller,
+                          decoration: _fieldDecoration(
+                            hint: 'Choice ${index + 1}',
+                            icon: Icons.add_circle_outline,
+                            isEmpty: index == 0 && allChoicesEmpty,
+                          ),
+                          onChanged: (_) {
+                            if (_submitted) setState(() {});
+                          },
+                          onSubmitted: (_) => _addChoice(),
+                        ),
+                      ),
+                      if (_choiceControllers.length > 1)
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline),
+                          color: Colors.redAccent,
+                          onPressed: () => _removeChoiceField(index),
+                        ),
+                    ],
+                  ),
+                );
+              }),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: _addChoiceField,
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Another Choice'),
                 ),
-                onChanged: (_) {
-                  if (_submitted) setState(() {});
-                },
-                onSubmitted: (_) => _addChoice(),
               ),
-              const SizedBox(height: 10),
-              const Text(
-                'The category is for grouping your choices.',
-                style: TextStyle(
-                  fontSize: 17,
-                  color: Color.fromARGB(255, 133, 131, 131),
-                ),
-              ),
+              // const SizedBox(height: 10),
+              // const Text(
+              //   'The category is for grouping your choices.',
+              //   style: TextStyle(
+              //     fontSize: 17,
+              //     color: Color.fromARGB(255, 133, 131, 131),
+              //   ),
+              // ),
             ],
           ),
         ),
