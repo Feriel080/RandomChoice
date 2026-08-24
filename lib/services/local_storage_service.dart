@@ -20,7 +20,6 @@ class LocalStorageService {
     return {};
   }
   
-  // didn't fix it yet
   Future<void> saveChoices(Map<String, List<String>> choices) async {
     try {
       final prefs = await SharedPreferences.getInstance();
