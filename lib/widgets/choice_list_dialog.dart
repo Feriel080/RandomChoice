@@ -133,17 +133,44 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
   bool get _isEmpty => _currentChoices.values.every((list) => list.isEmpty);
 
   Map<String, List<String>> get _filteredChoices {
-  if (_searchQuery.isEmpty) return _currentChoices;
-  return {
-    for (final entry in _currentChoices.entries)
-      entry.key: entry.value
-          .where(
-            (choice) =>
-                choice.toLowerCase().contains(_searchQuery.toLowerCase()),
-          )
-          .toList(),
-  }..removeWhere((_, list) => list.isEmpty);
-}
+    if (_searchQuery.isEmpty) return _currentChoices;
+
+    final query = _searchQuery.toLowerCase();
+
+    return {
+      for (final entry in _currentChoices.entries)
+        entry.key: entry.value
+            .where((choice) => choice.toLowerCase().contains(query))
+            .toList(),
+    }..removeWhere((_, list) => list.isEmpty);
+  }
+
+  TextSpan _highlightMatch(String text, String query) {
+    if (query.isEmpty) return TextSpan(text: text);
+
+    final lowerText = text.toLowerCase();
+    final lowerQuery = query.toLowerCase();
+
+    final start = lowerText.indexOf(lowerQuery);
+
+    if (start == -1) return TextSpan(text: text);
+
+    final end = start + query.length;
+
+    return TextSpan(
+      children: [
+        TextSpan(text: text.substring(0, start)),
+        TextSpan(
+          text: text.substring(start, end),
+          style: const TextStyle(
+            color: Color.fromARGB(255, 28, 58, 117),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        TextSpan(text: text.substring(end)),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -282,8 +309,8 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
                                       ),
                                     ),
                                   ),
-                                  title: Text(
-                                    choice,
+                                  title: Text.rich(
+                                    _highlightMatch(choice, _searchQuery),
                                     style: TextStyle(
                                       decoration: isDeleting
                                           ? TextDecoration.lineThrough
