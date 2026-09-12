@@ -22,10 +22,11 @@ flutter:
   uses-material-design: true
 
 flutter_launcher_icons:
+  android: true
   image_path: "assets/random_choice_icon.png"
   adaptive_icon_background: "#667eea" 
   adaptive_icon_foreground: "assets/random_choice_icon.png"
   windows: 
     generate: true
     icon_path: "assets/random_choice_icon.png"
-  android: true
+  

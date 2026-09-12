@@ -134,11 +134,11 @@ class _AddChoiceDialogState extends State<AddChoiceDialog> {
                   children: const [
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('Existing Category'),
+                      child: Text('Existing'),
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Text('New Category'),
+                      child: Text('New'),
                     ),
                   ],
                 ),
