@@ -6,7 +6,7 @@ on:
     workflow_dispatch:
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -43,16 +43,30 @@ jobs:
       - name: Build APK
         run: flutter build apk --split-per-abi
 
-      # Build Windows EXE
-      - name: Build Windows
-        run: flutter build windows --release
-
       # Upload the APK for download
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+  
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Build Windows EXE
+      - name: Build Windows
+        run: flutter build windows --release
 
       # Upload the Windows EXE (and supporting files)
       - name: Upload Windows
