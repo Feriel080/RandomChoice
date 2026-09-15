@@ -130,6 +130,73 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
     }
   }
 
+  Future<void> _deleteCategory(String category) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Category?'),
+        content: Text(
+            'Are you sure you want to delete the entire "$category"? This will delete all choices under this category.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFce315f),
+            ),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Color(0xFFffe3ea)),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final originalChoices = _currentChoices[category] ?? [];
+
+    setState(() {
+      _currentChoices.remove(category);
+    });
+
+    try {
+      for (final choice in originalChoices) {
+        await widget.onDelete(category, choice);
+      }
+      widget.onRefresh();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('"$category" and its choices deleted successfully ✅'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _currentChoices[category] = originalChoices;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete category: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
   bool get _isEmpty => _currentChoices.values.every((list) => list.isEmpty);
 
   Map<String, List<String>> get _filteredChoices {
@@ -275,13 +342,27 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
                         children: [
                           Padding(
                             padding: const EdgeInsets.fromLTRB(8, 12, 8, 4),
-                            child: Text(
-                              category,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF591C75),
-                              ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  category,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF591C75),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Color.fromARGB(255, 117, 28, 59),
+                                    size: 20,
+                                  ),
+                                  onPressed: () => _deleteCategory(category),
+                                  tooltip: 'Delete this category',
+                                ),
+                              ],
                             ),
                           ),
                           ...items.asMap().entries.map((entry) {
