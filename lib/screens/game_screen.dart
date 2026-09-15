@@ -404,6 +404,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       FloatingActionButton.extended(
+                        heroTag: 'add_choice',
                         onPressed: () => showDialog(
                           context: context,
                           builder: (context) => AddChoiceDialog(
@@ -427,6 +428,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                         ),
                       ),
                       FloatingActionButton.extended(
+                        heroTag: 'view_list',
                         onPressed: () async {
                           final result = await showDialog<String>(
                             context: context,
