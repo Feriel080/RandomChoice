@@ -26,6 +26,7 @@ flutter_launcher_icons:
   image_path: "assets/random_choice_icon.png"
   adaptive_icon_background: "#667eea" 
   adaptive_icon_foreground: "assets/random_choice_icon.png"
+  adaptive_icon_foreground_inset: 35
   windows: 
     generate: true
     icon_path: "assets/random_choice_icon.png"
