@@ -263,6 +263,7 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
           ] else ...[
             Expanded(
               child: TextField(
+                autofocus: true,
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Search...',
