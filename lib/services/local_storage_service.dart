@@ -3,24 +3,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' show log;
 
 class LocalStorageService {
-  static const String _choicesKey = 'random_choices';
+  static const String _choicesKey = 'choices';
   
-  Future<List<String>> getChoices() async {
+  Future<Map<String, List<String>>> getChoices() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final choicesJson = prefs.getString(_choicesKey);
       if (choicesJson != null) {
-        final List<dynamic> choicesList = json.decode(choicesJson);
-        return choicesList.cast<String>();
+        final Map<String, dynamic> choicesMap = json.decode(choicesJson);
+        return choicesMap.map((key, value) => MapEntry(key, List<String>.from(value)));
       }
     } catch (e) {
       log('Error loading choices from local storage: $e');
 
     }
-    return [];
+    return {};
   }
   
-  Future<void> saveChoices(List<String> choices) async {
+  Future<void> saveChoices(Map<String, List<String>> choices) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final choicesJson = json.encode(choices);
@@ -30,10 +30,12 @@ class LocalStorageService {
     }
   }
   
-  Future<void> addChoice(String choice) async {
-    final choices = await getChoices();
-    if (!choices.contains(choice)) {
-      choices.add(choice);
+
+  Future<void> addChoice(String category, String choice) async {
+    final choices = await getChoices(); 
+    choices[category] ??= [];
+    if (!choices[category]!.contains(choice)) {
+      choices[category]!.add(choice);
       await saveChoices(choices);
     }
   }
@@ -47,10 +49,13 @@ class LocalStorageService {
     }
   }
 
-  Future<void> deleteChoice(String choice) async {
+  Future<void> deleteChoice(String category, String choice) async {
     try {
       final choices = await getChoices();
-      choices.remove(choice);
+      choices[category]?.remove(choice);
+      if(choices[category]?.isEmpty ?? false) {
+        choices.remove(category);
+      }
       await saveChoices(choices);
     } catch (e) {
       log('Error deleting choice from local storage: $e');

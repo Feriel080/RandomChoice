@@ -1,6 +1,6 @@
 name: random_choice
-description: "Randomly choose an item from a list."
-version: 2.0.0
+description: "An app that randomly choose things for you." 
+version: 1.0.0+1
 
 environment:
   sdk: ^3.8.1
@@ -10,11 +10,23 @@ dependencies:
     sdk: flutter
   http: 1.4.0
   shared_preferences: ^2.5.3
+  logger: ^1.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/random_choice_icon.png"
+  adaptive_icon_background: "#667eea" 
+  adaptive_icon_foreground: "assets/random_choice_icon.png"
+  windows: 
+    generate: true
+    icon_path: "assets/random_choice_icon.png"
+  
