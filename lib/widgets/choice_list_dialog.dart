@@ -249,7 +249,9 @@ class _ChoiceListDialogState extends State<ChoiceListDialog>
           if (!_isSearching) ...[
             const Text(
               'List Contents',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold),
             ),
             const Spacer(),
             IconButton(

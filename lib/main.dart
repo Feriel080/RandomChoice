@@ -21,7 +21,7 @@ class RandomChoiceGameApp extends StatelessWidget {
       title: 'Random Choice',
       theme: ThemeData(
         primarySwatch: Colors.purple,
-        fontFamily: 'Caveat',
+        fontFamily: 'Pixelify Sans',
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: _shouldShowSplash() ? const SplashScreen() : const GameScreen(),

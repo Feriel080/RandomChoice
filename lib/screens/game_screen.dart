@@ -418,7 +418,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           'Add Item',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 18,
                           ),
                         ),
                         backgroundColor: const Color.fromARGB(
@@ -450,7 +450,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
                           'View List',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 18,
                           ),
                         ),
                         backgroundColor: const Color(0xFFedeeff),
