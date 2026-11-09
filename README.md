@@ -1,8 +1,6 @@
 # RandomChoice
 
-A simple offline cross-platform app using flutter. Useful for decision-making, raffle draws, or random picks!
-
-***The app is not ready for installation yet***
+A simple offline cross-platform app using flutter. Useful for raffle draws, or random picks!
 
 ## Features ✨
 
